@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import type { User } from "../types";
 
 export default function Register() {
   const { user, register } = useAuth();
@@ -9,6 +10,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<User["role"]>("sales");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -21,7 +23,7 @@ export default function Register() {
     setError("");
     setSubmitting(true);
     try {
-      await register(name, email, password);
+      await register(name, email, password, role);
       navigate("/");
     } catch {
       setError("Could not create account. Email may already be in use.");
@@ -90,6 +92,24 @@ export default function Register() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
             />
+          </div>
+          <div>
+            <label
+              htmlFor="role"
+              className="mb-1 block text-sm font-medium text-slate-700"
+            >
+              Role
+            </label>
+            <select
+              id="role"
+              required
+              value={role}
+              onChange={(e) => setRole(e.target.value as User["role"])}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
+            >
+              <option value="sales">Sales</option>
+              <option value="admin">Admin</option>
+            </select>
           </div>
           <button
             type="submit"

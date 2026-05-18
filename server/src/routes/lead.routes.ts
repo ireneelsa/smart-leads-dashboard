@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as leadController from "../controllers/lead.controller";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../middleware/auth.middleware";
 
 const router = Router();
 

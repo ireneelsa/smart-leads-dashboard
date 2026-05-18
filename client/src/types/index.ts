@@ -4,7 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "user" | "admin";
+  role: "admin" | "sales";
 }
 
 export interface Lead {

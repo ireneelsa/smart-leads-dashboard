@@ -1,15 +1,11 @@
-import bcrypt from "bcryptjs";
 import mongoose, { Document, Schema } from "mongoose";
+import type { IUser, UserRole } from "../types/interfaces";
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
-  password: string;
-  role: "user" | "admin";
-  comparePassword(candidate: string): Promise<boolean>;
-}
+const USER_ROLES: UserRole[] = ["admin", "sales"];
 
-const userSchema = new Schema<IUser>(
+export type IUserDocument = Omit<IUser, "id"> & Document;
+
+const userSchema = new Schema<IUserDocument>(
   {
     name: { type: String, required: true, trim: true },
     email: {
@@ -19,19 +15,15 @@ const userSchema = new Schema<IUser>(
       lowercase: true,
       trim: true,
     },
-    password: { type: String, required: true, minlength: 6 },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false,
+    },
+    role: { type: String, enum: USER_ROLES, default: "sales" },
   },
   { timestamps: true },
 );
 
-userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
-  this.password = await bcrypt.hash(this.password, 10);
-});
-
-userSchema.methods.comparePassword = function (candidate: string) {
-  return bcrypt.compare(candidate, this.password);
-};
-
-export const User = mongoose.model<IUser>("User", userSchema);
+export const User = mongoose.model<IUserDocument>("User", userSchema);

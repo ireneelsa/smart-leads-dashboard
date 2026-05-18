@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { AuthRequest } from "../middleware/auth";
+import { AuthRequest } from "../middleware/auth.middleware";
 import { ILead, LEAD_STATUSES, Lead, LeadStatus } from "../models/Lead";
 
 function isLeadStatus(value: string): value is LeadStatus {
@@ -9,7 +9,7 @@ function isLeadStatus(value: string): value is LeadStatus {
 export async function getLeads(req: AuthRequest, res: Response): Promise<void> {
   try {
     const { status, search } = req.query;
-    const filter: Record<string, unknown> = { owner: req.user!._id };
+    const filter: Record<string, unknown> = { owner: req.user!.userId };
 
     if (typeof status === "string" && status.length > 0) {
       if (!isLeadStatus(status)) {
@@ -37,7 +37,7 @@ export async function getLeadStats(
   res: Response,
 ): Promise<void> {
   try {
-    const owner = req.user!._id;
+    const owner = req.user!.userId;
     const [total, byStatus] = await Promise.all([
       Lead.countDocuments({ owner }),
       Lead.aggregate<{ _id: LeadStatus; count: number }>([
@@ -87,7 +87,7 @@ export async function createLead(req: AuthRequest, res: Response): Promise<void>
       phone,
       status,
       notes,
-      owner: req.user!._id,
+      owner: req.user!.userId,
     });
 
     res.status(201).json(lead);
@@ -100,7 +100,7 @@ export async function updateLead(req: AuthRequest, res: Response): Promise<void>
   try {
     const lead = await Lead.findOne({
       _id: req.params.id,
-      owner: req.user!._id,
+      owner: req.user!.userId,
     });
 
     if (!lead) {
@@ -135,7 +135,7 @@ export async function deleteLead(req: AuthRequest, res: Response): Promise<void>
   try {
     const lead = await Lead.findOneAndDelete({
       _id: req.params.id,
-      owner: req.user!._id,
+      owner: req.user!.userId,
     });
 
     if (!lead) {

@@ -14,7 +14,12 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role: User["role"],
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -24,9 +29,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const persistSession = useCallback((token: string, nextUser: User) => {
+  const persistSession = useCallback(async (token: string) => {
     localStorage.setItem("token", token);
-    setUser(nextUser);
+    const { data } = await api.get<User>("/api/auth/me");
+    setUser(data);
   }, []);
 
   const logout = useCallback(() => {
@@ -36,22 +42,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const { data } = await api.post<{ token: string; user: User }>(
-        "/api/auth/login",
-        { email, password },
-      );
-      persistSession(data.token, data.user);
+      const { data } = await api.post<{ token: string }>("/api/auth/login", {
+        email,
+        password,
+      });
+      await persistSession(data.token);
     },
     [persistSession],
   );
 
   const register = useCallback(
-    async (name: string, email: string, password: string) => {
-      const { data } = await api.post<{ token: string; user: User }>(
-        "/api/auth/register",
-        { name, email, password },
-      );
-      persistSession(data.token, data.user);
+    async (
+      name: string,
+      email: string,
+      password: string,
+      role: User["role"],
+    ) => {
+      const { data } = await api.post<{ token: string }>("/api/auth/register", {
+        name,
+        email,
+        password,
+        role,
+      });
+      await persistSession(data.token);
     },
     [persistSession],
   );
