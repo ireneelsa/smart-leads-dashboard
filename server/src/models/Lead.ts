@@ -1,39 +1,50 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
+import type { ILead, LeadSource, LeadStatus } from "../types/interfaces";
 
-export const LEAD_STATUSES = [
+const LEAD_STATUSES: LeadStatus[] = [
   "new",
   "contacted",
   "qualified",
   "lost",
-] as const;
+];
 
-export type LeadStatus = (typeof LEAD_STATUSES)[number];
+const LEAD_SOURCES: LeadSource[] = ["website", "instagram", "referral"];
 
-export interface ILead extends Document {
-  name: string;
-  email: string;
-  company?: string;
-  phone?: string;
-  status: LeadStatus;
-  notes?: string;
-  owner: Types.ObjectId;
-}
+export type ILeadDocument = Omit<ILead, "id"> & {
+  createdBy: Types.ObjectId;
+} & Document;
 
-const leadSchema = new Schema<ILead>(
+const leadSchema = new Schema<ILeadDocument>(
   {
     name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true, lowercase: true },
-    company: { type: String, trim: true },
-    phone: { type: String, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
     status: {
       type: String,
       enum: LEAD_STATUSES,
       default: "new",
     },
-    notes: { type: String, trim: true },
-    owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    source: {
+      type: String,
+      enum: LEAD_SOURCES,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
-  { timestamps: true },
+  { timestamps: false },
 );
 
-export const Lead = mongoose.model<ILead>("Lead", leadSchema);
+export default mongoose.model<ILeadDocument>("Lead", leadSchema);

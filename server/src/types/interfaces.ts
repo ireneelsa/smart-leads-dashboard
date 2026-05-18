@@ -4,6 +4,19 @@ export type LeadStatus = "new" | "contacted" | "qualified" | "lost";
 
 export type LeadSource = "website" | "instagram" | "referral";
 
+export const LEAD_STATUSES: readonly LeadStatus[] = [
+  "new",
+  "contacted",
+  "qualified",
+  "lost",
+];
+
+export const LEAD_SOURCES: readonly LeadSource[] = [
+  "website",
+  "instagram",
+  "referral",
+];
+
 export interface IUser {
   id: string;
   name: string;
