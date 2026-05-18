@@ -100,8 +100,8 @@ export default function Leads() {
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Leads</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Leads</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Create, filter, and manage your pipeline
           </p>
         </div>
@@ -120,12 +120,12 @@ export default function Leads() {
           placeholder="Search name or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[200px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
+          className="min-w-[200px] flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-indigo-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:ring-indigo-400"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
+          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-indigo-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:ring-indigo-400"
         >
           <option value="">All statuses</option>
           {LEAD_STATUSES.map((s) => (
@@ -139,13 +139,13 @@ export default function Leads() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
-          <h2 className="mb-4 text-lg font-medium text-slate-900">
+          <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-white">
             {editingId ? "Edit lead" : "New lead"}
           </h2>
           {error && (
-            <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">
               {error}
             </p>
           )}
@@ -155,7 +155,7 @@ export default function Leads() {
               placeholder="Name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
             />
             <input
               required
@@ -163,7 +163,7 @@ export default function Leads() {
               placeholder="Email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
             />
             <select
               required
@@ -171,7 +171,7 @@ export default function Leads() {
               onChange={(e) =>
                 setForm({ ...form, source: e.target.value as LeadSource })
               }
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
             >
               {LEAD_SOURCES.map((s) => (
                 <option key={s} value={s}>
@@ -184,7 +184,7 @@ export default function Leads() {
               onChange={(e) =>
                 setForm({ ...form, status: e.target.value as LeadStatus })
               }
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
             >
               {LEAD_STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -203,7 +203,7 @@ export default function Leads() {
             <button
               type="button"
               onClick={resetForm}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Cancel
             </button>
@@ -211,14 +211,14 @@ export default function Leads() {
         </form>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         {loading ? (
-          <p className="p-6 text-sm text-slate-500">Loading leads...</p>
+          <p className="p-6 text-sm text-slate-500 dark:text-slate-400">Loading leads...</p>
         ) : leads.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">No leads found.</p>
+          <p className="p-6 text-sm text-slate-500 dark:text-slate-400">No leads found.</p>
         ) : (
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
+            <thead className="border-b border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
               <tr>
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
@@ -229,16 +229,16 @@ export default function Leads() {
             </thead>
             <tbody>
               {leads.map((lead) => (
-                <tr key={lead._id} className="border-b border-slate-100">
-                  <td className="px-4 py-3 font-medium text-slate-900">
+                <tr key={lead._id} className="border-b border-slate-100 dark:border-slate-800">
+                  <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
                     {lead.name}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{lead.email}</td>
-                  <td className="px-4 py-3 text-slate-600">
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{lead.email}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                     {SOURCE_LABELS[lead.source]}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                       {STATUS_LABELS[lead.status]}
                     </span>
                   </td>
@@ -247,14 +247,14 @@ export default function Leads() {
                       <button
                         type="button"
                         onClick={() => openEdit(lead)}
-                        className="text-indigo-600 hover:underline"
+                        className="text-indigo-600 hover:underline dark:text-indigo-400"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(lead._id)}
-                        className="text-red-600 hover:underline"
+                        className="text-red-600 hover:underline dark:text-red-400"
                       >
                         Delete
                       </button>

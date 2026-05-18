@@ -64,8 +64,8 @@ export default function Dashboard() {
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Dashboard</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Manage and filter your lead pipeline
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function Dashboard() {
       />
 
       {error && (
-        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">
           {error}
         </p>
       )}

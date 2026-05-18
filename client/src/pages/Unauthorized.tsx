@@ -5,9 +5,9 @@ export default function Unauthorized() {
   const { logout, user } = useAuth();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 text-center">
-      <h1 className="text-2xl font-semibold text-slate-900">Access denied</h1>
-      <p className="mt-2 max-w-md text-sm text-slate-600">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 text-center dark:bg-slate-950">
+      <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Access denied</h1>
+      <p className="mt-2 max-w-md text-sm text-slate-600 dark:text-slate-300">
         {user
           ? `Your role (${user.role}) does not have permission to view this page.`
           : "You do not have permission to view this page."}
@@ -22,7 +22,7 @@ export default function Unauthorized() {
         <button
           type="button"
           onClick={logout}
-          className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           Log out
         </button>

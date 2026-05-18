@@ -31,7 +31,7 @@ const emptyForm: LeadFormState = {
 };
 
 const fieldClass =
-  "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none ring-indigo-500 transition focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500";
+  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-indigo-500 transition focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:ring-indigo-400 dark:disabled:bg-slate-800 dark:disabled:text-slate-500";
 
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -162,24 +162,24 @@ export default function LeadModal({
 
   return (
     <div
-      className="flex min-h-screen items-center justify-center bg-slate-950/40 p-4"
+      className="flex min-h-screen items-center justify-center bg-slate-950/40 p-4 dark:bg-black/60"
       role="presentation"
       onClick={handleBackdropClick}
     >
       <div
-        className="w-full max-w-lg rounded-xl border border-slate-200 bg-white shadow-xl"
+        className="w-full max-w-lg rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900"
         role="dialog"
         aria-modal="true"
         aria-labelledby="lead-modal-title"
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <h2 id="lead-modal-title" className="text-lg font-semibold text-slate-900">
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+          <h2 id="lead-modal-title" className="text-lg font-semibold text-slate-900 dark:text-white">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-xl leading-none text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+            className="rounded-lg px-2 py-1 text-xl leading-none text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
             aria-label="Close modal"
           >
             ×
@@ -188,7 +188,7 @@ export default function LeadModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 p-6">
           {submitError && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">
               {submitError}
             </p>
           )}
@@ -196,7 +196,7 @@ export default function LeadModal({
           <div>
             <label
               htmlFor="lead-name"
-              className="mb-1 block text-sm font-medium text-slate-700"
+              className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200"
             >
               Name
             </label>
@@ -210,14 +210,14 @@ export default function LeadModal({
               aria-invalid={errors.name ? "true" : "false"}
             />
             {errors.name && (
-              <p className="mt-1 text-xs text-red-600">{errors.name}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.name}</p>
             )}
           </div>
 
           <div>
             <label
               htmlFor="lead-email"
-              className="mb-1 block text-sm font-medium text-slate-700"
+              className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200"
             >
               Email
             </label>
@@ -231,7 +231,7 @@ export default function LeadModal({
               aria-invalid={errors.email ? "true" : "false"}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email}</p>
             )}
           </div>
 
@@ -239,7 +239,7 @@ export default function LeadModal({
             <div>
               <label
                 htmlFor="lead-status"
-                className="mb-1 block text-sm font-medium text-slate-700"
+                className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200"
               >
                 Status
               </label>
@@ -260,14 +260,14 @@ export default function LeadModal({
                 ))}
               </select>
               {errors.status && (
-                <p className="mt-1 text-xs text-red-600">{errors.status}</p>
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.status}</p>
               )}
             </div>
 
             <div>
               <label
                 htmlFor="lead-source"
-                className="mb-1 block text-sm font-medium text-slate-700"
+                className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200"
               >
                 Source
               </label>
@@ -288,7 +288,7 @@ export default function LeadModal({
                 ))}
               </select>
               {errors.source && (
-                <p className="mt-1 text-xs text-red-600">{errors.source}</p>
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.source}</p>
               )}
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function LeadModal({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Cancel
             </button>
