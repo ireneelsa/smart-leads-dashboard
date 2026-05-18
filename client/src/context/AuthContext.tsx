@@ -7,48 +7,77 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
-import api from "../lib/api";
-import type { User } from "../types";
+import api from "../api/axios";
+import type {
+  AuthTokenResponse,
+  AuthUser,
+  IUserProfile,
+  UserRole,
+} from "../types";
+import {
+  clearAuthSession,
+  loadAuthSession,
+  saveAuthSession,
+} from "../utils/authStorage";
 
 interface AuthContextValue {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
+  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (
     name: string,
     email: string,
     password: string,
-    role: User["role"],
+    role: UserRole,
   ) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function profileToAuthUser(
+  profile: IUserProfile,
+  token: string,
+): AuthUser {
+  return {
+    name: profile.name,
+    email: profile.email,
+    role: profile.role,
+    token,
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const persistSession = useCallback(async (token: string) => {
-    localStorage.setItem("token", token);
-    const { data } = await api.get<User>("/api/auth/me");
-    setUser(data);
+  const isAuthenticated = user !== null && user.token.length > 0;
+
+  const setSession = useCallback((authUser: AuthUser) => {
+    saveAuthSession(authUser);
+    setUser(authUser);
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("token");
+    clearAuthSession();
     setUser(null);
   }, []);
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const { data } = await api.post<{ token: string }>("/api/auth/login", {
+      const { data } = await api.post<AuthTokenResponse>("/api/auth/login", {
         email,
         password,
       });
-      await persistSession(data.token);
+
+      const { data: profile } = await api.get<IUserProfile>("/api/auth/me", {
+        headers: { Authorization: `Bearer ${data.token}` },
+      });
+
+      setSession(profileToAuthUser(profile, data.token));
     },
-    [persistSession],
+    [setSession],
   );
 
   const register = useCallback(
@@ -56,36 +85,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name: string,
       email: string,
       password: string,
-      role: User["role"],
+      role: UserRole,
     ) => {
-      const { data } = await api.post<{ token: string }>("/api/auth/register", {
+      const { data } = await api.post<AuthTokenResponse>(
+        "/api/auth/register",
+        { name, email, password, role },
+      );
+
+      const authUser: AuthUser = {
         name,
         email,
-        password,
         role,
-      });
-      await persistSession(data.token);
+        token: data.token,
+      };
+
+      setSession(authUser);
     },
-    [persistSession],
+    [setSession],
   );
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setLoading(false);
-      return;
+    const session = loadAuthSession();
+    if (session) {
+      setUser(session);
     }
-
-    api
-      .get<User>("/api/auth/me")
-      .then((res) => setUser(res.data))
-      .catch(() => logout())
-      .finally(() => setLoading(false));
-  }, [logout]);
+    setLoading(false);
+  }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, register, logout }),
-    [user, loading, login, register, logout],
+    () => ({
+      user,
+      loading,
+      isAuthenticated,
+      login,
+      register,
+      logout,
+    }),
+    [user, loading, isAuthenticated, login, register, logout],
   );
 
   return (

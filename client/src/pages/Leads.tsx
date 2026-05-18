@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import api from "../lib/api";
-import type { Lead, LeadStatus } from "../types";
-import { LEAD_STATUSES, STATUS_LABELS } from "../types";
+import api from "../api/axios";
+import type { ILeadDocument, LeadSource, LeadStatus } from "../types";
+import type { PaginatedLeadsResponse } from "../types";
+import { LEAD_SOURCES, LEAD_STATUSES } from "../types";
+import { SOURCE_LABELS, STATUS_LABELS } from "../utils";
 
 const emptyForm = {
   name: "",
   email: "",
-  company: "",
-  phone: "",
+  source: "website" as LeadSource,
   status: "new" as LeadStatus,
-  notes: "",
 };
 
 export default function Leads() {
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leads, setLeads] = useState<ILeadDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -29,8 +29,10 @@ export default function Leads() {
       const params: Record<string, string> = {};
       if (search.trim()) params.search = search.trim();
       if (statusFilter) params.status = statusFilter;
-      const { data } = await api.get<Lead[]>("/api/leads", { params });
-      setLeads(data);
+      const { data } = await api.get<PaginatedLeadsResponse>("/api/leads", {
+        params,
+      });
+      setLeads(data.leads);
     } finally {
       setLoading(false);
     }
@@ -53,14 +55,12 @@ export default function Leads() {
     setShowForm(true);
   }
 
-  function openEdit(lead: Lead) {
+  function openEdit(lead: ILeadDocument) {
     setForm({
       name: lead.name,
       email: lead.email,
-      company: lead.company ?? "",
-      phone: lead.phone ?? "",
+      source: lead.source,
       status: lead.status,
-      notes: lead.notes ?? "",
     });
     setEditingId(lead._id);
     setShowForm(true);
@@ -73,10 +73,8 @@ export default function Leads() {
     const payload = {
       name: form.name,
       email: form.email,
-      company: form.company || undefined,
-      phone: form.phone || undefined,
+      source: form.source,
       status: form.status,
-      notes: form.notes || undefined,
     };
 
     try {
@@ -119,7 +117,7 @@ export default function Leads() {
       <div className="mb-6 flex flex-wrap gap-3">
         <input
           type="search"
-          placeholder="Search name, email, company..."
+          placeholder="Search name or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="min-w-[200px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
@@ -167,18 +165,20 @@ export default function Leads() {
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
-            <input
-              placeholder="Company"
-              value={form.company}
-              onChange={(e) => setForm({ ...form, company: e.target.value })}
+            <select
+              required
+              value={form.source}
+              onChange={(e) =>
+                setForm({ ...form, source: e.target.value as LeadSource })
+              }
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            />
-            <input
-              placeholder="Phone"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            />
+            >
+              {LEAD_SOURCES.map((s) => (
+                <option key={s} value={s}>
+                  {SOURCE_LABELS[s]}
+                </option>
+              ))}
+            </select>
             <select
               value={form.status}
               onChange={(e) =>
@@ -192,12 +192,6 @@ export default function Leads() {
                 </option>
               ))}
             </select>
-            <input
-              placeholder="Notes"
-              value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
-            />
           </div>
           <div className="mt-4 flex gap-2">
             <button
@@ -228,7 +222,7 @@ export default function Leads() {
               <tr>
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Company</th>
+                <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Actions</th>
               </tr>
@@ -241,7 +235,7 @@ export default function Leads() {
                   </td>
                   <td className="px-4 py-3 text-slate-600">{lead.email}</td>
                   <td className="px-4 py-3 text-slate-600">
-                    {lead.company || "—"}
+                    {SOURCE_LABELS[lead.source]}
                   </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">

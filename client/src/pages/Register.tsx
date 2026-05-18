@@ -2,29 +2,39 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import type { User } from "../types";
+import type { UserRole } from "../types";
 
 export default function Register() {
-  const { user, register } = useAuth();
+  const { isAuthenticated, register } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<User["role"]>("sales");
+  const [role, setRole] = useState<UserRole>("sales");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (user) {
-    return <Navigate to="/" replace />;
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedName || !trimmedEmail || !trimmedPassword) {
+      setError("Name, email, password, and role are required.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      await register(name, email, password, role);
-      navigate("/");
+      await register(trimmedName, trimmedEmail, trimmedPassword, role);
+      navigate("/dashboard");
     } catch {
       setError("Could not create account. Email may already be in use.");
     } finally {
@@ -55,6 +65,7 @@ export default function Register() {
               id="name"
               type="text"
               required
+              autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
@@ -71,6 +82,7 @@ export default function Register() {
               id="email"
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
@@ -88,6 +100,7 @@ export default function Register() {
               type="password"
               required
               minLength={6}
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
@@ -104,7 +117,7 @@ export default function Register() {
               id="role"
               required
               value={role}
-              onChange={(e) => setRole(e.target.value as User["role"])}
+              onChange={(e) => setRole(e.target.value as UserRole)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
             >
               <option value="sales">Sales</option>

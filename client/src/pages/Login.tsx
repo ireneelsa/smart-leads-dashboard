@@ -4,24 +4,33 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
-  const { user, login } = useAuth();
+  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (user) {
-    return <Navigate to="/" replace />;
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
+      setError("Email and password are required.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      await login(email, password);
-      navigate("/");
+      await login(trimmedEmail, trimmedPassword);
+      navigate("/dashboard");
     } catch {
       setError("Invalid email or password");
     } finally {
@@ -54,6 +63,7 @@ export default function Login() {
               id="email"
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
@@ -70,6 +80,7 @@ export default function Login() {
               id="password"
               type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"

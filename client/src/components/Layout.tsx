@@ -19,11 +19,8 @@ export default function Layout() {
             Smart Leads
           </Link>
           <nav className="flex items-center gap-1">
-            <NavLink to="/" end className={navClass}>
+            <NavLink to="/dashboard" className={navClass}>
               Dashboard
-            </NavLink>
-            <NavLink to="/leads" className={navClass}>
-              Leads
             </NavLink>
           </nav>
           <div className="flex items-center gap-3">
