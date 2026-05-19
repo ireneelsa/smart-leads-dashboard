@@ -7,14 +7,43 @@ import leadRoutes from "./routes/lead.routes";
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+interface ServerConfig {
+  port: string;
+  mongoUri: string;
+  jwtSecret: string;
+  frontendUrl: string;
+}
 
-app.use(cors());
+function getRequiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} is required but was not provided`);
+  }
+  return value;
+}
+
+function loadConfig(): ServerConfig {
+  return {
+    port: getRequiredEnv("PORT"),
+    mongoUri: getRequiredEnv("MONGO_URI"),
+    jwtSecret: getRequiredEnv("JWT_SECRET"),
+    frontendUrl: getRequiredEnv("FRONTEND_URL"),
+  };
+}
+
+const config = loadConfig();
+const app = express();
+
+app.use(
+  cors({
+    origin: config.frontendUrl,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
+  res.json({ status: "ok", timestamp: new Date() });
 });
 
 app.use("/api/auth", authRoutes);
@@ -35,24 +64,20 @@ app.use(
 );
 
 async function start(): Promise<void> {
-  const mongoUri = process.env.MONGO_URI;
-
-  if (!mongoUri) {
-    console.error("MongoDB connection failed: MONGO_URI is not defined");
-    process.exit(1);
-  }
-
   try {
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(config.mongoUri);
     console.log("MongoDB connected successfully");
   } catch (error) {
     console.error("MongoDB connection failed:", error);
     process.exit(1);
   }
 
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  app.listen(config.port, () => {
+    console.log(`Server running on port ${config.port}`);
   });
 }
 
-start();
+start().catch((error: unknown) => {
+  console.error("Server startup failed:", error);
+  process.exit(1);
+});
